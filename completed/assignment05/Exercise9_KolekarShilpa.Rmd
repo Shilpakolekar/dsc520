@@ -1,0 +1,118 @@
+---
+title: Exercise 9 - Student Survey
+author: Shilpa Kolekar
+date: October 4th 2020
+output:
+  
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Question: A 
+
+Use R to calculate the covariance of the Survey variables and provide an explanation of why you would use this calculation and what the results indicate.
+```{r}
+
+# read a CSV file into studnet_df dataframe
+students_df <- read.csv("C:/Users/shilp/Documents/GitHub/dsc520/data/student-survey.csv")
+
+cov(students_df)
+```
+By looking at the data, we can indicate that TimeTv and TimeReading are negatively correlated with each other. Which means when TimeTv increases, TimeReading decreases and vise versa. Happiness is negatively correlated with TimeReading but positively correlated with TimeTv. When TimeTv increases Happiness increases, but when TimeReading increases happiness decreases. Gender is the variable which is part of the dataset but does not impact any other variables.
+
+Question: B
+
+Examine the Survey data variables. What measurement is being used for the variables? Explain what effect changing the measurement being used for the variables would have on the covariance calculation. Would this be a problem? Explain and provide a better alternative if needed.
+
+Each variable in survey data is different than other.  TimeReading data is numeric and unit is hours. TimeTV is also numeric and unit is minutes. Happiness is measure in percentage and has floating values and Gender is in 0 and 1 so it could be Male = 0 and Female = 1 or vice versa. If units for variables are changed, covariance will drastically change and give different output. 
+
+correlation is the better alternative to covariance becuase correlation is in the range of 1 and -1 and it does not change evenif the unit of variable changes. 
+
+Question: C
+
+Choose the type of correlation test to perform, explain why you chose this test, and make a prediction if the test yields a positive or negative correlation?
+```{r}
+cor(students_df, method = "pearson")
+
+cor(students_df, method = "spearman")
+
+cor(students_df, method = "kendall")
+```
+There are three methods that can be used to perform correlation tests and they are Pearson, Spearman, and Kendall. if you compare numbers in each methods they are same or close to other method numbers. This explains that relationship between all three methods are almost the same.
+
+The Kendall method does not support rcorr() function. Pearson is most appropriate for measurements taken from an interval scale, while the Spearman is more appropriate for measurements taken from ordinal scales. Out of three Pearson method is the best fit for the test.
+
+
+Question: D (1)
+
+Perform a correlation analysis of: All variables
+
+```{r}
+cor(students_df)
+
+```
+
+Question: D (2)
+
+A single correlation between two a pair of the variables
+```{r}
+cor.test(students_df$TimeReading, students_df$TimeTV)
+```
+Question: D (3)
+
+
+Repeat your correlation test in step 2 but set the confidence interval at 99%
+```{r}
+cor.test(students_df$TimeReading, students_df$TimeTV, conf.level = 0.99)
+```
+Question: D (4)
+
+Describe what the calculations in the correlation matrix suggest about the relationship between the variables. Be specific with your explanation.
+
+* TimeReading has high negative correlation with TimeTV.
+* TimeReading has low negative correlation with Happiness.
+* TimeReading has no correlation with Gender.
+* TimeTV has low positive correlation with Happiness.
+* TimeTV has no correlation with Gender.
+* Happiness has no correlation with Gender.
+
+95% confidence level is the default level. At that confidence level, the correlation will be between -0.6021920 and -0.9694145. The p value is 0.0003153, which is less than 0.05. This confirms high negative correlation between TimeReading and TimeTV.
+
+At 99% confidence level, the correlation will be between -0.4453124 and -0.9801052. The p value is 0.0003153, which is less than 0.05. This confirms high negative correlation between TimeReading and TimeTV.
+
+
+Question: E
+
+Calculate the correlation coefficient and the coefficient of determination, describe what you conclude about the results.
+
+```{r}
+cor(students_df)
+
+cor(students_df)^2
+```
+
+Correlation coefficient measures relationship between two variables and tells how strong the relationship is, Coefficient of determination measures the amount of variability in one variable that is shared by another. coefficient of determination is a squared value of correlation coefficient, which is always positive. TimeReading and TimeTV variables have high negative correlation based on correlation coefficient. TimeReading shares 77.98% of variability of TimeTV.
+
+Question: F
+
+Based on your analysis can you say that watching more TV caused students to read less? Explain.
+
+Both the variables show strong negative relationship and high variability. This means that increase in one can decrease another, and they share 77.98% of variability. This confirms that Watching more TV causes students to read less. 
+
+
+Question: G
+
+Pick three variables and perform a partial correlation, documenting which variable you are “controlling”. Explain how this changes your interpretation and explanation of the results.
+
+```{r}
+library(ggm)
+pcor(c("TimeReading", "TimeTV", "Happiness"), var(students_df))
+
+```
+TimeReading and TimeTV are the variables for which the partial correlation test is being performed while controlling Happiness variable. The correlation coefficient is -0.872945 which is very close to the correlation coefficient between TimeReading and TimeTV of -0.88306768 without any control variables. The correlation between TimeReading and TimeTV does not change much even after controlling the Happiness variable.
+
+
+
