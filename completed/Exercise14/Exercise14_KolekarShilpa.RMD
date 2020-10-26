@@ -1,0 +1,76 @@
+---
+title: "Exercise 14 - Fit a logistic regression model "
+author: "Kolekar, Shilpa"
+date: October 26th, 2020
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+## Set the working directory 
+setwd("C:/Users/shilp/Documents/GitHub/dsc520/data")
+
+## Load the `data/binary-classifier-data.csv` to
+binary_classifer_df <- read.csv("binary-classifier-data.csv")
+summary(binary_classifer_df)
+```
+## a. What is the accuracy of the logistic regression classifier?
+```{r}
+newModel <- glm(label ~ x + y, data = binary_classifer_df, family = binomial)
+
+## install.packages("caTools")
+library("caTools")
+
+split <- sample(1:nrow(binary_classifer_df), 0.8 * nrow(binary_classifer_df))
+train <- binary_classifer_df[split,]
+test <- binary_classifer_df[-split,]
+
+# run the test data through model
+res <- predict(newModel, test, type= "response")
+res <- predict(newModel, train, type = "response")
+
+##validate the model confusion matrix
+confmatrix <- table(Actual_Value = train$label, Predicted_Value = res > 0.5)
+confmatrix
+
+# Accuracy
+(confmatrix[[1,1]]+ confmatrix[[2,2]]) / sum(confmatrix)
+
+```
+Accuracy if model is 58.10%.
+
+
+## b. How does the accuracy of the logistic regression classifier compare to the nearest neighbors algorithm?
+```{r}
+
+##extract 1st column of train dataset because it will be used as 'cl' argument in knn function.
+target_category <- binary_classifer_df[split,1]
+
+##extract 1st column if test dataset to measure the accuracy
+test_category <- binary_classifer_df[-split,1]
+
+##load the package class
+## install.packages("class")
+library("class")
+
+##run knn function, k=sqrt(1498)
+test_pred <- knn(train,test,cl=target_category,k=39)
+test_pred
+
+##create confusion matrix
+table <- table(test_category, test_pred)
+table
+
+# Accuracy
+(table[[1,1]]+ table[[2,2]]) / sum(table)
+
+```
+Accuracy of the logistic regression classifier model is 58.10%, and the nearest neighbors algorithm model gave 97.00% of accuracy. 
+
+## c. Why is the accuracy of the logistic regression classifier different from that of the nearest neighbors?
+Nearest neighbors model has low biased and low variance data. To get the better accuracy rate on the model low biased (less error data in training data) and low variance (less error in the test data) is required. Based on the accuracy percentage, nearest neighbors model has low biased and low variance data.
+
