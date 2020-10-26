@@ -1,0 +1,60 @@
+---
+title: "Exercise 13 - Thoraricsurgery"
+author: "Kolekar, Shilpa"
+date: October 25th, 2020
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+## install.packages("foreign")
+library("foreign")
+
+## Set the working directory 
+setwd("C:/Users/shilp/Documents/GitHub/dsc520/data")
+
+## Load the `data/ThoraricSurgery` to
+surgery_df <- read.arff("ThoraricSurgery.arff")
+summary(surgery_df)
+```
+
+
+
+## a. Fit a binary logistic regression model to the data set that predicts whether or not the patient survived for one year (the Risk1Y variable) after the surgery. Use the glm() function to perform the logistic regression. See Generalized Linear Models for an example. Include a summary using the summary() function in your results.
+
+```{r}
+newModel <- glm(Risk1Yr ~ DGN + PRE4 + PRE5 + PRE6 + PRE7 + PRE8 + PRE9 + PRE10 + PRE11 + PRE14 + PRE17 + PRE19 + PRE25 + PRE30 + PRE32 + AGE, data = surgery_df, family = binomial)
+summary(newModel)
+```
+b. According to the summary, which variables had the greatest effect on the survival rate?
+
+By looking at the summary, PRE9T, PRE14OC14, PRE17T, and PRE30T variables have the greatest effect on the survival rate because their P value is 0.05 or below which means these variable are statistically significant.
+
+
+c. To compute the accuracy of your model, use the dataset to predict the outcome variable. The percent of correct predictions is the accuracy of your model. What is the accuracy of your model?
+
+```{r}
+## install.packages("caTools")
+library("caTools")
+split <- sample.split(surgery_df, SplitRatio = 0.8)
+train <- subset(surgery_df, split == "TRUE")
+test <- subset(surgery_df, split == "FALSE")
+# run the test data through model
+res <- predict(newModel, test, type= "response")
+res <- predict(newModel, train, type = "response")
+##validate the model confusion matrix
+
+confmatrix <- table(Actual_Value = train$Risk1Yr, Predicted_Value = res > 0.5)
+confmatrix
+
+# Accuracy
+(confmatrix[[1,1]]+ confmatrix[[2,2]]) / sum(confmatrix)
+
+```
+Accuracy of model is 86.07%. 
+
+
